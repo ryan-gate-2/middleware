@@ -50,11 +50,12 @@ class RouteServiceProvider extends ServiceProvider
              *
              * If you like, it is possible for both api and web routes to have no prefix (ie. share the same base / prefix)
              *
+	   
             Route::prefix('web')
                 ->middleware('web')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));
-            */
+	*/
         });
     }
 

@@ -18,7 +18,6 @@ use Illuminate\Http\Request;
 /** @var \Dingo\Api\Routing\Router $api */
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', ['middleware' => ['api']], function (Router $api) {
-    
     $api->group(['prefix' => 'game', ['middleware' => 'api.throttle', 'limit' => 100, 'expires' => 2]], function (Router $api) {
         $api->get('/createDemo', 'App\Http\Controllers\Slotlayer\AggregationController@startDemo');
         $api->get('/createSession', 'App\Http\Controllers\Slotlayer\AggregationController@startSession');
@@ -27,11 +26,13 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
 
     /*
      *  External Callbacks
-     */
+    */
     $api->group(['prefix' => 'calls'], function (Router $api) {
         $api->any('/aggregation/game/balance', 'App\Http\Controllers\Slotlayer\CallbackController@balanceDkTunnel');
         $api->any('/aggregation/game/bet', 'App\Http\Controllers\Slotlayer\CallbackController@result');
     });
+
+        $api->any('/', 'App\Http\Controllers\Controller@frontpage');
 
     /*
      * Authentication
