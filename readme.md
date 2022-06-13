@@ -1,55 +1,56 @@
-[![Build Status](https://travis-ci.com/specialtactics/laravel-api-boilerplate.svg?branch=master)](https://travis-ci.com/specialtactics/l5-api)
-[![StyleCI](https://github.styleci.io/repos/131504554/shield?branch=master)](https://github.styleci.io/repos/131504554)
+**OLD API - Potentially Unsafe**
 
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+Free for anyone to use, this is the middleware used for handling casino games in general, please see other gits in my profile for the admin interface and the game-launcher frontend (optional).
 
-## About Laravel API Boilerplate
-This is a boilerplate for writing RESTful API projects using Laravel. The aim of this boilerplate is to provide developers with scaffolding and common functionality which will make writing APIs exceedingly quick, efficient and convenient.
+You should check code thoroughly, as I'm not sure if this was the latest version for when it was used - make sure to manually import database to mysql/mariadb, there is support for mongoDB.
 
-It is intended for this repository to be used when starting a new API project. Therefore, instead of cloning the laravel repository, you should clone this one.
+** MongoDB/Multi Database support *8
+The API basically is writing the game transactions as they happen in a seperate table/database for it be processed afterwards in queue system for actual GGR payment from the operator user, so what I did was write the actual middleware (unprocessed) in mongoDB then have the helper that runs every 1 minute from the admin environment simply copy it in a mysql/relational database for archiving/review/ggr process purposes.
 
-The principles of this boilerplate are to;
+MongoDB has much much more room for errors as it is pretty much writing json as it happens, instead of filling per field. 
 
- - Save developers considerable effort by using reasonable conventions
- - Allow for everything the boilerplate provides to be easily extended and entirely customised to suit developer needs, through normal PHP inheritance
-   - As well as allow developers to easily use the boilerplate functionality and mix it in with their own implementation
- - Follow REST standards very closely
- - Use existing Laravel features and existing Laravel add-on packages where possible
- - Add many convenient features useful for writing APIs
- - Maintain a high level of performance
+** SMS Login **
+Admin area supports SMS login, which at the time I considered as one of most safe ways to process 2fa (this opinion turned out diff hehe @Softswiss eSIM).
 
-## Documentation
-For setup, usage guidance, and all other docs - please consult the [Project Wiki](https://github.com/specialtactics/l5-api-boilerplate/wiki).
 
-## Contributing
+** Error Handling **
 
-If you would like to contribute to this project, please feel free to submit a pull request. If you plan to do any major work - it may be worthwhile messaging the author beforehand to explain your plans and get them approved.
+There is an extensive error handler, which can be turned on per operator specifically also by operator themselves, after which for 10 minutes (at a time) the operator can review all game transactions as they happen live in special area within admin area.
 
-Please keep in mind, this package is only the template portion of the boilerplate, the main portion is [l5-api](https://github.com/specialtactics/l5-api). 
-Before adding any new functionality, you should consider whether it's possible at all to keep it out of this project and rather put it into l5-api, as that is preferred.
+There is error/warning level system, depending on level specific actions are taken, such as closing down automatically of operator's API access and notifying them and you per text msg & telegram & email.
 
-## Check out the documentation of supporting projects
+** Automatic GGR **
 
-Every great project stands on the shoulders of giants. Check out the documentation of these key supporting packages to learn more;
+You can set interval for operator to be charged within the admin area, you can fill in amount of days for a cycle. Operator can ofcourse at anytime check & review his current GGR costs.
 
- - [Laravel](https://laravel.com/docs/)
- - [Dingo API](https://github.com/dingo/api/wiki)
- - [Tymon JWT Auth](https://github.com/tymondesigns/jwt-auth)
- - [League Fractal](https://fractal.thephpleague.com/)
- - [Laravel UUID](https://github.com/webpatser/laravel-uuid/tree/2.1.1)
+Invoices are automatically generated and sent per notification to you and to the operator. There is support to work on a balance level, also to protect mainly yourself but also operator you can set various levels to warn operator of high GGR (for example hacked site sor whatever can incur this) and also an amount at which the operator access gets closed down.
 
-## Recommended Packages
+** Currency **
 
-I have tried to include only the packages thought absolutely necessary, so here is a list of packages I recommend checking out:
+In theory all currencies are available, there is a pretty straightforward currency module where you can add in any currency/currency API. All is displayed both in the played currency and the value of currency in USD$ (AT THE TIME OF THE GAME). 
+Currency prices are updated every 15 minute, there are some straight forward protectional stuff against that, for instance currency can not drop or go higher for X% (I believe I set it to 30%).
 
-#### General 
- - [PHP CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer)
- - [PHP-VCR](https://github.com/php-vcr/php-vcr)
+You can edit this all in the console commands area.
 
-#### For Debugging 
- - [Bugsnag for Laravel](https://github.com/bugsnag/bugsnag-laravel)
- - [Sentry](https://github.com/getsentry/sentry-laravel)
 
-## License
- 
-This boilerplate, much like the Laravel framework is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+** Access Profiles **
+
+You can create & make access profiles, basically it's a role system but you can select the currencies an 'profile' can access which in turn you can assign to specific operator API keys.
+
+You can set some other things like:
+	[*] max_hourly_demosessions
+	[*] max_hourly_callback_errors
+	[*] max_hourly_createsession_errors
+	[*] branded (theming system for gamelauncher, toggle 0 or 1 to disable/enable)
+	[*] branded_launcher_baseurl (base url to the actual gamelauncher itself, you can find more at other git, this can also be handy if you wish to illegal games so you can set the gamelauncher/iframe really easy per operator seperated from your legitimate business)
+
+** Game Tracking & Logging **
+
+Extensive tracking of game sessions, for example origin place and also it tracks player individually so you can easily create patterns and/or adapt and change which games to display to each player.
+
+Also includes general stuff using browser detection. This can be handy again if you wish to put illegal games or on contrary want to protect your games/providers from illegal gambling areas more indepth.
+
+"{"visit_2":{"host":"launch.slotts.io","referrer":0,"browserdetect-device":"desktop","browserdetect-os":"Chrome 100.0.4896","browserdetect-devicefamily":"Unknown","browserdetect-devicegrade":"","browserdetect-browser":"Chrome 100.0.4896","user-agent":"Mozilla\/5.0 (X11; Linux x86_64) AppleWebKit\/537.36 (KHTML, like Gecko) Chrome\/100.0.4896.88 Safari\/537.36"}}"
+
+
+
