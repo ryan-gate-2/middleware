@@ -16,7 +16,6 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerExceptionHandler();
-        $this->registerTelescope();
     }
 
     /**
@@ -41,13 +40,4 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    /**
-     * Conditionally register the telescope service provider
-     */
-    protected function registerTelescope()
-    {
-        if ($this->app->environment('local', 'testing')) {
-            $this->app->register(TelescopeServiceProvider::class);
-        }
-    }
 }

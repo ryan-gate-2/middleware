@@ -32,11 +32,18 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         $api->any('/aggregation/game/bet', 'App\Http\Controllers\Slotlayer\CallbackController@result');
     });
 
-        $api->any('/', 'App\Http\Controllers\Controller@frontpage');
+    $api->any('/', 'App\Http\Controllers\Controller@frontpage');
 
     /*
-     * Authentication
-     */
+     *  External Callbacks
+    */
+    $api->group(['prefix' => 'internal'], function (Router $api) {
+        $api->any('/createGame', 'App\Http\Controllers\Slotlayer\APIGameController@gameURLRequest');
+    });
+
+    /*
+    * Authentication
+    */
     $api->group(['prefix' => 'auth'], function (Router $api) {
         $api->group(['prefix' => 'jwt'], function (Router $api) {
             $api->get('/token', 'App\Http\Controllers\Auth\AuthController@token');
@@ -47,15 +54,17 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         $api->get('/testRetrieveAccessProfiles', 'App\Models\Slotlayer\AccessProfiles@testRetrieve');
         $api->get('/testBalanceCallback/game/bet', 'App\Http\Controllers\Slotlayer\CallbackController@testBalanceCallback');
         $api->get('/testBalanceCallback/game/balance', 'App\Http\Controllers\Slotlayer\CallbackController@testBalanceCallback');
+
+        $api->get('/temporary/evoplay_endpoint', 'App\Http\Controllers\Slotlayer\EvoplayController@endpoint');
+    });
+
+    $api->group(['prefix' => 'data'], function (Router $api) {
+        $api->get('/gameslist', 'App\Http\Controllers\Slotlayer\DataController@gamesList');
     });
 
     /*
      * Authenticated routes
-     */
     $api->group(['middleware' => ['api.auth']], function (Router $api) {
-        /*
-         * Authentication
-         */
         $api->group(['prefix' => 'auth'], function (Router $api) {
             $api->group(['prefix' => 'jwt'], function (Router $api) {
                 $api->get('/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
@@ -67,7 +76,6 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
 
         /*
          * Users
-         */
         $api->group(['prefix' => 'users', 'middleware' => 'check_role:admin'], function (Router $api) {
             $api->get('/', 'App\Http\Controllers\UserController@getAll');
             $api->get('/{uuid}', 'App\Http\Controllers\UserController@get');
@@ -79,9 +87,11 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
 
         /*
          * Roles
-         */
         $api->group(['prefix' => 'roles'], function (Router $api) {
             $api->get('/', 'App\Http\Controllers\RoleController@getAll');
-        });
+        });   
+
     });
+  */
+
 });

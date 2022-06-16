@@ -5,7 +5,7 @@ use Laravel\Telescope\Watchers;
 
 return [
 
-    'path' => 'telescope',
+    'path' => '/nope',
 
     /*
     |--------------------------------------------------------------------------
@@ -14,7 +14,7 @@ return [
     |
     | Change to 'dark' for dark mode
     */
-    'ui-mode' => env('TELESCOPE_UI_MODE', 'light'),
+    'ui-mode' => env('TELESCOPE_UI_MODE', 'dark'),
 
     /*
     |--------------------------------------------------------------------------
@@ -121,3 +121,4 @@ return [
         Watchers\ScheduleWatcher::class => env('TELESCOPE_SCHEDULE_WATCHER', true),
     ],
 ];
+

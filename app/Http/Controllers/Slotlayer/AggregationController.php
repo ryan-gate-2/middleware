@@ -82,7 +82,7 @@ class AggregationController extends \App\Http\Controllers\Controller
     {
         $validator = Validator::make($request->all(), [
             'apikey' => ['required', 'min:12', 'max:155'],
-            'apikey_owner' => ['required', 'min:2', 'max:20'],
+            'apikey_owner' => ['required', 'min:2', 'max:40'],
             'game' => ['required', 'min:3', 'max:100'],
             'currency' => ['required', 'min:2', 'max:7'],
         ]);
@@ -91,7 +91,8 @@ class AggregationController extends \App\Http\Controllers\Controller
             return response()->json(['status' => 400, 'error' => 'Validation of request form failed.', 'validation_messages' => $validator->errors(), 'request_ip' => $_SERVER['REMOTE_ADDR']])->setStatusCode(400);
         }
 
-        $ip = $_SERVER['REMOTE_ADDR'];
+        //$ip = $_SERVER['REMOTE_ADDR'];
+        $ip = $request->header('CF-Connecting-IP');
 
         $selectParentApiSettings = GameoptionsParent::where('apikey_parent', $request->apikey)->first();
 
@@ -191,7 +192,7 @@ class AggregationController extends \App\Http\Controllers\Controller
          * Request, store demo session & serve the actual launcher
          */
         $generateDemoPlayerID = 'demo'.rand(1000000, 99999999999);
-        $url = 'https://api.dk.games/v2:709:1fCdsFe/createGame?apikey='.self::getApikeyDk($selectParentApiSettings->access_profile, 'USD').'&userid='.$generateDemoPlayerID.'&game='.$request->game.'&mode=demo';
+        $url = 'https://rdev1.bets.sh/internal/createGame?apikey='.self::getApikeyDk($selectParentApiSettings->access_profile, 'USD').'&currency='.$currency.'&userid='.$generateDemoPlayerID.'&game='.$request->game.'&mode=demo';
         $getDemo = Http::get($url);
         $decodeResult = json_decode($getDemo, true);
 
@@ -257,7 +258,7 @@ class AggregationController extends \App\Http\Controllers\Controller
     {
         $validator = Validator::make($request->all(), [
             'apikey' => ['required', 'min:20', 'max:255'],
-            'apikey_owner' => ['required', 'min:2', 'max:20'],
+            'apikey_owner' => ['required', 'min:2', 'max:40'],
             'game' => ['required', 'min:3', 'max:100'],
             'playerid' => ['required', 'min:3', 'max:100', 'regex:/^[^(\|\]`!%^&=};:?><’)]*$/'],
             'extra_currency' => ['min:2', 'max:7'],
@@ -270,8 +271,8 @@ class AggregationController extends \App\Http\Controllers\Controller
             return response()->json(['status' => 400, 'error' => 'Validation of request form failed.', 'validation_messages' => $validator->errors(), 'request_ip' => $_SERVER['REMOTE_ADDR']])->setStatusCode(400);
         }
 
-        $ip = $_SERVER['REMOTE_ADDR'];
-
+        //$ip = $_SERVER['REMOTE_ADDR'];
+        $ip = $request->header('CF-Connecting-IP');
 
         if(str_contains($request->playerid, '-') || str_contains($request->playerid, '.')) {
             return response()->json([
@@ -376,7 +377,7 @@ class AggregationController extends \App\Http\Controllers\Controller
         $currency = strtoupper($request->currency);
         $playerID = $request->playerid;
         $concatSessionUser = $selectApiSettings->id.'.'.$currency.'.'.$playerID.'-'.$currency;
-        $url = 'https://api.dk.games/v2:709:1fCdsFe/createGame?apikey='.self::getApikeyDk($selectParentApiSettings->access_profile, $currency).'&userid='.$concatSessionUser.'&game='.$request->game.'&mode=real';
+        $url = 'https://rdev1.bets.sh/internal/createGame?apikey='.self::getApikeyDk($selectParentApiSettings->access_profile, $currency).'&currency='.$currency.'&userid='.$concatSessionUser.'&game='.$request->game.'&mode=real';
         $createSession = Http::get($url);
         $decodeResult = json_decode($createSession, true);
 
@@ -415,7 +416,7 @@ class AggregationController extends \App\Http\Controllers\Controller
                 'updated_at' => now(),
                 'created_at' => now()
             ]);
-            if($accessProfileSettings === 0) {
+            if($accessProfileSettings->branded === 0) {
                 $launchurl = $decodeResult['url'];
             } else {
                 $launchurl = 'https://launcher.betboi.io?key='.$tokenEncrypt.'&mode=regular';
